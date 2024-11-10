@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+      "removeComments": true,
+      "sourceMap": true
+    },
+    "include": [
+      "src/**/*"
+    ]
+  }
