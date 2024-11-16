@@ -2,11 +2,13 @@ import * as PHASER from 'phaser';
 import { MenuScene } from './scenes/menu';
 import { PepeTennisScene } from './scenes/pepeTennis';
 import { GameOverScene } from './scenes/gameover';
+import { PauseScene } from './scenes/pause';
 
 const scene = [
   MenuScene,
   PepeTennisScene,
-  GameOverScene
+  GameOverScene,
+  PauseScene
 ];
 
 export class Game extends PHASER.Game {
@@ -33,7 +35,8 @@ export class Game extends PHASER.Game {
     backgroundColor: '#00ff00',
     scene,
     audio: {
-      disableWebAudio: false
+      disableWebAudio: false,
+      
     }
   }
 

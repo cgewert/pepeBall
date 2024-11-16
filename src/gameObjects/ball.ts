@@ -1,7 +1,10 @@
-import { BallDirection, TennisObject } from "../tennis";
+import { BallDirection } from "../tennis";
 
-export class Ball implements TennisObject
+export class Ball extends Phaser.GameObjects.Sprite
 {
+    private static readonly DEFAULT_DEPTH = 999;
+    private static readonly DEFAULT_SCALE = 0.07;
+
     private _ball_velocity = 5;
     private _direction: BallDirection = 1;
     private _motionVector: Phaser.Math.Vector2;
@@ -44,22 +47,6 @@ export class Ball implements TennisObject
         this._ball_velocity_increase = value;
     }
 
-    public get X(){
-        return this._gameObject.x;
-    }
-
-    public set X(value: number){
-        this._gameObject.x = value;
-    }
-
-    public get Y(){
-        return this._gameObject.y;
-    }
-
-    public set Y(value: number){
-        this._gameObject.y = value;
-    }
-
     public get CanvasWidth(){
         return this._canvasSize.x;
     }
@@ -70,32 +57,24 @@ export class Ball implements TennisObject
 
     public get Height()
     {
-        return this._gameObject.displayHeight;
+        return this.displayHeight;
     }
 
     public get Width()
     {
-        return this._gameObject.displayWidth;
+        return this.displayWidth;
     }
 
     public constructor(
-        private _gameObject: Phaser.GameObjects.Sprite, private _canvasSize: Phaser.Math.Vector2, motionVector: Phaser.Math.Vector2)
+        scene: Phaser.Scene, x: number, y: number,
+        texture: string,
+        private _canvasSize: Phaser.Math.Vector2, motionVector: Phaser.Math.Vector2)
     {
+        super(scene, x, y, texture);
         this.MotionVector = motionVector;
-    }
-
-    public get GameObject(){
-        return this._gameObject;
-    }
-
-    destroy() 
-    {
-        this._gameObject.destroy(true);
-        this._gameObject = null;
-    }
-
-
-    public update(timeDelta: number)
-    {
+        this.addToDisplayList();
+        this.active = true;
+        this.setScale(Ball.DEFAULT_SCALE);
+        this.setDepth(Ball.DEFAULT_DEPTH);
     }
 }

@@ -1,5 +1,5 @@
 import { Game } from "..";
-import { GameMode } from "../tennis";
+import { GameData, GameMode } from "../tennis";
 import { PepeTennisScene } from "./pepeTennis";
 
 export class MenuScene extends Phaser.Scene
@@ -28,7 +28,9 @@ export class MenuScene extends Phaser.Scene
 
     public preload()
     {
-        this.load.image('background', 'assets/gfx/backgrounds/homer.jpg');
+        //this.load.image('background', 'assets/gfx/backgrounds/homer.jpg');
+
+        this.load.audio("frogs-title", "assets/audio/frogs-title.mp3");
     }
 
     public create(data: any)
@@ -42,18 +44,26 @@ export class MenuScene extends Phaser.Scene
         {
             if(!event.repeat)
             {
-                const data = {
+                const data: GameData = {
                     gameMode: this._selectedGameMode
                 };
+
+                this.sound.stopByKey("frogs-title");
                 this.scene.start(PepeTennisScene.CONFIG.key, data);
             }
         });
 
-        //this.add.image(0,0,"background").setOrigin(0,0);
-        
         this.keyUp = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         this.keyDown = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         this.keySpace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+        // TODO: Add background image
+
+        // Add scene sounds and music
+        this.sound.add("frogs-title", {
+            volume: 0.3,
+            loop: true
+        }).play();
 
         const padding: Phaser.Types.GameObjects.Text.TextPadding = {
             x: 20,
