@@ -30,12 +30,21 @@ export class PauseScene extends BaseScene
         this._viewPortHeight = this._main.height;
         this._viewPortWidth = this._main.width;
 
+        const bubble = this.add.graphics({ x: this._viewPortHalfWidth, y: 100 });
+        bubble.fillStyle(0x222222, 0.5);
+        bubble.fillRoundedRect(7, 7, 200, 100);
+        bubble.fillStyle(0xffffff, 0.8);
+        bubble.lineStyle(2, 0x000000);
+        bubble.fillRoundedRect(0, 0, 200, 100);
+
         this._pausedText = this.add.text(this._viewPortHalfWidth, 100, "PAUSED", {
             fontSize: "36px",
             color: 'black'
         });
-        // Center pause text on x-Axis
-        this._pausedText.x = this._viewPortHalfWidth - this._pausedText.displayWidth / 2;
+
+        // Center pause text within bubble
+        this._pausedText.x = bubble.x + 100 - this._pausedText.displayWidth / 2;
+        this._pausedText.y = bubble.y + 50 - this._pausedText.displayHeight / 2;
 
         // Register evend handlers
         this.input.keyboard.on('keydown-PAUSE', (_event: KeyboardEvent) =>

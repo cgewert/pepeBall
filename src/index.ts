@@ -17,11 +17,13 @@ export class Game extends PHASER.Game {
   public static readonly WIN_SCORE = 10;
   public static readonly NUM_PLAYER_PARAM = "numPlayers";
   public static readonly MENU_MUSIC_PARAM = "menuMusic";
-  public static readonly GAME_NAME = "pepeBall";
+  public static readonly GAME_NAME = "PepeBall";
 
   private static GAME_CONFIG: Phaser.Types.Core.GameConfig = {
     title: 'BOING!',
     type: PHASER.AUTO,
+    width: 1600,
+    height: 900,
     scale: {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH

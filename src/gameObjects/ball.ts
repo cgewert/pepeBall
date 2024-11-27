@@ -3,7 +3,7 @@ import { BallDirection } from "../tennis";
 export class Ball extends Phaser.GameObjects.Sprite
 {
     private static readonly DEFAULT_DEPTH = 999;
-    private static readonly DEFAULT_SCALE = 0.07;
+    private static readonly DEFAULT_SCALE = 0.1;
 
     private _ball_velocity = 5;
     private _direction: BallDirection = 1;

@@ -1,7 +1,7 @@
 import { Ball } from "../gameObjects/ball";
 import { Bat } from "../gameObjects/bat";
 import { ScoreCounter } from "../score";
-import { BallDirection, GameData } from "../tennis";
+import { BallDirection, GameData, PlayerAvatar } from "../tennis";
 import { GameOverScene } from "./gameover";
 import { GUI } from "dat.gui";
 import { PauseScene } from "./pause";
@@ -15,6 +15,8 @@ export class PepeTennisScene extends Phaser.Scene
     private _main: Phaser.Cameras.Scene2D.Camera;
     private _viewPortHalfWidth: number;
     private _viewPortHalfHeight: number;
+    private _viewPortWidth: number;
+    private _viewPortHeight: number;
     private _players: Array<Bat> = new Array<Bat>();
     private _p1Down: Phaser.Input.Keyboard.Key;
     private _p2Down: Phaser.Input.Keyboard.Key;
@@ -25,10 +27,26 @@ export class PepeTennisScene extends Phaser.Scene
     private _ballFolder: GUI;
     private _playerFolder: GUI;
     private _playerOne: Bat;
+    private _playerOneAvatar: Phaser.GameObjects.Sprite;
+    private _playerTwoAvatar: Phaser.GameObjects.Sprite;
+    private _tongueOne: Phaser.GameObjects.Sprite;
+    private _tongueTwo: Phaser.GameObjects.Sprite;
     private _playerTwo: Bat;
     private _playerOneScore: ScoreCounter;
     private _playerTwoScore: ScoreCounter;
     private _soundBatCollision: Phaser.Sound.WebAudioSound | Phaser.Sound.HTML5AudioSound | Phaser.Sound.BaseSound;
+    private _light: Phaser.GameObjects.Light;
+    private _ballEmitter1: Phaser.GameObjects.Particles.ParticleEmitter;
+    private _playerOneAvatars: Array<PlayerAvatar> = [
+        {name: "asteriks", flip: false, scale: 0.3, offsetX: -10, offsetY: 20},
+        {name: "kajit", flip: false, scale: 0.35, offsetX: -15, offsetY: 25},
+        {name: "ezio", flip: false, scale: 0.5, offsetX: -10, offsetY: 20},
+    ];
+    private _playerTwoAvatars: Array<PlayerAvatar> = [
+        {name: "pepeman", flip: true, scale: 0.3, offsetX: 0, offsetY: 35},
+        {name: "cat", flip: false, scale: 0.3, offsetX: 0, offsetY: 0},
+        {name: "riddler", flip: false, scale: 0.35, offsetX: 15, offsetY: 0},
+    ];
 
     public get GameOver()
     {
@@ -56,18 +74,49 @@ export class PepeTennisScene extends Phaser.Scene
 
     public preload()
     {
+        this.load.image('orb', 'assets/gfx/orb.png');
         this.load.image('ball', 'assets/gfx/ball.png');
-        this.load.image('p1', 'assets/gfx/avatars/hang-man-avatar.png');
 
-        this.load.audio("quak1", "assets/audio/quak1.mp3");
+        // Load player avatars
+        
+        this.load.image('pepeman', 'assets/gfx/avatars/pepe-man.png');
+        this.load.image('cat', 'assets/gfx/avatars/catpepe.png');
+        this.load.image('riddler', 'assets/gfx/avatars/riddler.png');
+
+        this.load.image('asteriks', 'assets/gfx/avatars/asterix-pepe.png');
+        this.load.image('kajit', 'assets/gfx/avatars/khajit-pepe.png');
+        this.load.image('ezio', 'assets/gfx/avatars/ezio-pepe.png');
+
+        this.load.image('grass', ['assets/gfx/grass.png', 'assets/gfx/grass_n.png']);
+        this.load.image('p1', 'assets/gfx/avatars/bat2.png');
+
+        this.load.spritesheet('tongue', 'assets/gfx/animations/tongue.png', { frameWidth: 356, frameHeight: 413 });
+
+        this.load.audio("quak1", "assets/audio/sfx/quak1.mp3");
     }
 
     public create(data: GameData)
     {
+        // Create sprite animations
+        this.anims.create({
+            key: 'lickdown',
+            frames: this.anims.generateFrameNumbers('tongue', { start: 5, end: 3 }),
+            frameRate: 8,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'lickup',
+            frames: this.anims.generateFrameNumbers('tongue', { start: 2, end: 0 }),
+            frameRate: 8,
+            repeat: -1
+        });
+
         // In every case create viewport dimensions first
         this._main = this.cameras.main;
         this._viewPortHalfHeight = this._main.height / 2;
         this._viewPortHalfWidth = this._main.width / 2;
+        this._viewPortHeight = this._main.height;
+        this._viewPortWidth = this._main.width;
 
         // Register event handlers
         this.input.keyboard.on('keydown-PAUSE', (_event: KeyboardEvent) =>
@@ -77,6 +126,9 @@ export class PepeTennisScene extends Phaser.Scene
                 this.scene.launch(PauseScene.CONFIG.key);
             }
         });
+
+        this.lights.enable();
+        this.lights.setAmbientColor(0xFFFFFF);
 
         // Create ingame HUD
         this._playerOneScore = new ScoreCounter(this, 0,0);
@@ -91,7 +143,8 @@ export class PepeTennisScene extends Phaser.Scene
             position: Phaser.Display.Align.CENTER
         });
         
-        //this.add.image(0,0,"background").setOrigin(0,0);
+        // Add a custom sized sprite gameobject using grass texture as canvas background
+        this.add.tileSprite(0, 0, this._viewPortWidth, this._viewPortHeight, 'grass').setPipeline("Light2D").setOrigin(0,0);
         this.addBall(1);
 
         this._p1Down = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Y);
@@ -113,18 +166,49 @@ export class PepeTennisScene extends Phaser.Scene
         }
 
         this._players[0].y = this._viewPortHalfHeight;
-        this._players[0].x = this._players[0].Width / 2;
+        this._players[0].x = 120 + this._players[0].Width / 2;
         this._players[1].y = this._viewPortHalfHeight;
-        this._players[1].x = this._main.width - this._players[1].Width / 2;
+        this._players[1].x = this._main.width - this._players[1].Width / 2 - 120;
         this._playerOne = this._players[0];
         this._playerTwo = this._players[1];
         this._playerTwo.setFlipX(true)
         this._playerOne.setDataEnabled();
         this._playerTwo.setDataEnabled();
+        const p1Avatar = this._playerOneAvatars[Phaser.Math.Between(0,this._playerOneAvatars.length - 1)]; const p2Avatar = this._playerTwoAvatars[Phaser.Math.Between(0,this._playerTwoAvatars.length - 1)];
+        this._playerOneAvatar = this.add.sprite(0, 0, p1Avatar.name).setScale(p1Avatar.scale).setFlipX(p1Avatar.flip);
+        this._playerTwoAvatar = this.add.sprite(0, 0, p2Avatar.name).setFlipX(p2Avatar.flip).setScale(p2Avatar.scale);
+        this._playerOneAvatar.setPosition(this._playerOneAvatar.displayWidth / 2, this._viewPortHalfHeight - this._playerOneAvatar.displayHeight / 2);
+        this._playerTwoAvatar.setPosition(this._viewPortWidth - this._playerTwoAvatar.displayWidth / 2, this._viewPortHalfHeight - this._playerTwoAvatar.displayHeight / 2);
+        this._playerOne.setPipeline("Light2D");
+        this._playerTwo.setPipeline("Light2D");
+        this._tongueOne = this.add.sprite(0, 0, 'tongue', 0);
+        this._tongueTwo = this.add.sprite(0, 0, 'tongue', 0).setFlipX(true);
+        this._tongueOne.play('lick');
+        this._tongueOne.setScale(0.25);
+        this._tongueTwo.play('lick');
+        this._tongueTwo.setScale(0.25);
+        this.setTonguePosition(this._tongueOne, this._playerOneAvatar, p1Avatar);
+        this.setTonguePosition(this._tongueTwo, this._playerTwoAvatar, p2Avatar);
         
+        this._ballEmitter1 = this.add.particles(0, 0, 'orb', {
+            speed: 40,
+            lifespan: 300,
+            frequency: 15,
+            quantity: 3,
+            scale: { start: 0.3, end: 0 },
+            emitting: false
+        });
+
         this.createDebugUI();
 
         this._soundBatCollision = this.sound.add("quak1").setVolume(0.3);
+    }
+
+    private setTonguePosition(tongue: Phaser.GameObjects.Sprite, avatar: Phaser.GameObjects.Sprite, avatarData: PlayerAvatar)
+    {
+        const tongueWidth = avatar.x < this._viewPortHalfWidth ? tongue.displayWidth : -tongue.displayWidth;
+
+        tongue.setPosition(avatar.x + tongueWidth / 2 + avatarData.offsetX, avatar.y + avatarData.offsetY);
     }
 
     public update(delta: number)
@@ -142,7 +226,28 @@ export class PepeTennisScene extends Phaser.Scene
             }
             x.update(delta)
         });
-        
+
+        // Update tongue animations
+        if(Phaser.Input.Keyboard.JustDown(this._p1Down)){
+            this._tongueOne.play('lickdown');
+        }
+        else if(Phaser.Input.Keyboard.JustDown(this._p1Up)){
+            this._tongueOne.play('lickup');
+        }
+        else if(this._p1Up.isUp && this._p1Down.isUp){
+            this._tongueOne.stop();
+        }
+
+        if(Phaser.Input.Keyboard.JustDown(this._p2Down)){
+            this._tongueTwo.play('lickdown');
+        }
+        else if(Phaser.Input.Keyboard.JustDown(this._p2Up)){
+            this._tongueTwo.play('lickup');
+        }
+        else if(this._p2Up.isUp && this._p2Down.isUp){
+            this._tongueTwo.stop();
+        }
+
         // Move the ball
         for(let i=0; i < this._ball?.BallVelocity; i++)
         {
@@ -162,6 +267,20 @@ export class PepeTennisScene extends Phaser.Scene
             if(this._ball == null)
                 break;
         }
+        if(this._ball)
+        {
+            this._light.setPosition(this._ball.x, this._ball.y);
+            this._ballEmitter1.emitParticleAt(this._ball.x, this._ball.y);
+            this._ball.rotation += this._ball.Direction / 10;
+            if(this._ball.rotation >= 2 * Math.PI){
+                this._ball.rotation = 0;
+            }
+            if(this._ball.rotation <= -2 * Math.PI){
+                this._ball.rotation = 0;
+            }
+
+        }
+            
     }
 
     private checkWallCollision()
@@ -215,14 +334,16 @@ export class PepeTennisScene extends Phaser.Scene
         let newDirection = 1 as BallDirection;
         let hasScored = false;
         
-        if(this._ball.x >= this._playerTwo.x && (this._ball.y > this._playerTwo.y + this._playerTwo.Height / 2 || this._ball.y < this._playerTwo.y - this._playerTwo.Height / 2 ))
+        //if(this._ball.x >= this._playerTwo.x && (this._ball.y > this._playerTwo.y + this._playerTwo.Height / 2 || this._ball.y < this._playerTwo.y - this._playerTwo.Height / 2 ))
+        if(this._ball.x >= this._viewPortWidth - this._ball.displayWidth / 2)
         {
             hasScored = true;
             this._playerOneScore.Score++;
             this._playerOneScore.activateSoreAnimation();
             newDirection = -1;
         }
-        else if(this._ball.x <= this._playerOne.x && (this._ball.y > this._playerOne.y + this._playerOne.Height / 2 || this._ball.y < this._playerOne.y - this._playerOne.Height / 2))
+        //else if(this._ball.x <= this._playerOne.x && (this._ball.y > this._playerOne.y + this._playerOne.Height / 2 || this._ball.y < this._playerOne.y - this._playerOne.Height / 2))
+        else if(this._ball.x <= this._ball.displayWidth / 2)
         {
             hasScored = true;
             this._playerTwoScore.Score++;
@@ -251,6 +372,7 @@ export class PepeTennisScene extends Phaser.Scene
         this._ball.x = this._viewPortHalfWidth - this._ball.Width / 2;
         this._ball.y = this._viewPortHalfHeight - this._ball.Height / 2;
         this._ball.Direction = direction;
+        this._light = this.lights.addLight(0, 0, 200).setIntensity(1.75);
 
         this.createDebugUI();
     }
@@ -288,8 +410,12 @@ export class PepeTennisScene extends Phaser.Scene
                 this._ballFolder.add(this._ball, "scale", 0, 25, 0.00001);
                 this._ballFolder.add(this._ball, "BallVelocity", -100, 100, 0.01);
                 this._ballFolder.add(this._ball, "BallVelocityIncrease", -10, 10, 0.01);
+                if(this._light)
+                {
+                    this._ballFolder.add(this._light, "intensity", 0, 50, 0.01);
+                }
             }
-            
+
             if(this._playerOne && this._playerTwo)
             {
                 this._playerFolder = this._datGUI.addFolder("PLAYERS");

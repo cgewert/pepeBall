@@ -1,11 +1,20 @@
-✔ Fix Scene transitions and Pause Ingame Scene when in game over ? @done(24-11-13 21:58)
-☐ Add gameplay ideas
-☐ Add sounds @started(24-11-13 21:59)
-☐ Add music @started(24-11-13 21:59)
-☐ Add graphics
-☐ Add animations
+✔ Add random player avatars @started(24-11-24 15:31) @done(24-11-24 16:01) @lasted(30m42s)
+✔ Style pause text @started(24-11-24 15:31) @done(24-11-24 16:30) @lasted(59m19s)
+✔ Place tongues correctly @started(24-11-24 16a:30) @done(24-11-24 17:27) @lasted(57m59s)
+✔ animate tongues based on paddle movement @started(24-11-24 16:30) @done(24-11-24 18:37) @lasted(2h7m8s)
+☐ goal sound / animations
+☐ Check ball movement on collision
+☐ Create Game over screen
+☐ Fix ball collision when ball is behind bat
+☐ Fix movement speed of AI player
+☐ Animate tongue for AI player
 
 
 
 Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=64867">freesound_community</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=64867">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=36013">freesound_community</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=36013">Pixabay</a>
+
+Graphics:
+    goku-pepe:  Peepo Training Goku Gi / https://www.deviantart.com/cerberus814/
+    ezio-pepe: Pepe Ezio MonkaS / https://www.deviantart.com/markosboss 
+    khajit-pepe: Pepe Khajiit Wink / https://www.deviantart.com/markosboss 
