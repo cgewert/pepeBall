@@ -30,7 +30,7 @@ export class PauseScene extends BaseScene
         this._viewPortHeight = this._main.height;
         this._viewPortWidth = this._main.width;
 
-        const bubble = this.add.graphics({ x: this._viewPortHalfWidth, y: 100 });
+        const bubble = this.add.graphics({ x: this._viewPortHalfWidth, y: this._viewPortHalfHeight - 50 });
         bubble.fillStyle(0x222222, 0.5);
         bubble.fillRoundedRect(7, 7, 200, 100);
         bubble.fillStyle(0xffffff, 0.8);

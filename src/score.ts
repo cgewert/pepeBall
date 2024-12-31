@@ -44,7 +44,7 @@ export class ScoreCounter extends Phaser.GameObjects.Text
         this.addToDisplayList();
     }
 
-    public activateSoreAnimation()
+    public activateScoreAnimation()
     {
         this.setTintFill(this._defaultScoringColor);
         this.scene.time.delayedCall(ScoreCounter.SCORE_ANIMATION_DURATION, () => this.clearTint());

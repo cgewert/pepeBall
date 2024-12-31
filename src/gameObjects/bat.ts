@@ -5,6 +5,15 @@ export class Bat extends Phaser.GameObjects.Sprite
 
     private _player_velocity = 21;
     private _isAiControlled = false;
+    private _aiYDirection = false;
+
+    public get AiYDirection(){
+        return this._aiYDirection;
+    }
+
+    public get IsAIControlled(){
+        return this._isAiControlled;
+    }
 
     public get PlayerVelocity(){
         return this._player_velocity;
@@ -16,11 +25,11 @@ export class Bat extends Phaser.GameObjects.Sprite
     }
 
     public get CanvasWidth(){
-        return this._canvasSize.x;
+        return this.scene.sys.canvas.width;
     }
 
     public get CanvasHeight(){
-        return this._canvasSize.y;
+        return this.scene.sys.canvas.height;
     }
 
     public get Height()
@@ -34,8 +43,8 @@ export class Bat extends Phaser.GameObjects.Sprite
     }
 
     public constructor(
-                scene: Phaser.Scene, x: number, y: number, texture: string,
-                private _canvasSize: Phaser.Math.Vector2, private downKey: Phaser.Input.Keyboard.Key, private upKey: Phaser.Input.Keyboard.Key)
+                scene: Phaser.Scene, x: number, y: number, 
+                texture: string, private downKey: Phaser.Input.Keyboard.Key, private upKey: Phaser.Input.Keyboard.Key)
     {
         super(scene, x, y, texture);
         this.addToDisplayList();
@@ -61,22 +70,28 @@ export class Bat extends Phaser.GameObjects.Sprite
         let target1 = this.CanvasHeight / 2;
         let target2 = by;
 
-        const weight1 = Math.min(1, distanceToPlayer / this.CanvasWidth / 2);
+        // If ball distance if far, we move to screen middle on y axis
+        // If ball distance if near, we move to balls y coordinate
+        const weight1 = Math.min(1, distanceToPlayer / (this.CanvasWidth / 2));
         const weight2 = 1 - weight1
         const targetY = (weight1 * target1) + (weight2 * target2);
-        
-        this.y = targetY;
+        const deltaY = Math.min(this.PlayerVelocity, Math.max(-this.PlayerVelocity, targetY - this.y));
+
+        this._aiYDirection = deltaY < 0;
+        let newY = this.y += deltaY;
+        newY = Phaser.Math.Clamp(this.y, this.Height / 2, this.CanvasHeight - this.Height / 2);
+        this.y = newY;
     }
 
     private updateHuman() 
     {
         if (this.downKey.isDown) {
             this.y += this.PlayerVelocity;
-            this.y = Phaser.Math.Clamp(this.y, this.Height / 2, this._canvasSize.y - this.Height / 2);
+            this.y = Phaser.Math.Clamp(this.y, this.Height / 2, this.CanvasHeight - this.Height / 2);
         }
         else if (this.upKey.isDown) {
             this.y -= this.PlayerVelocity;
-            this.y = Phaser.Math.Clamp(this.y, this.Height / 2, this._canvasSize.y - this.Height / 2);
+            this.y = Phaser.Math.Clamp(this.y, this.Height / 2, this.CanvasHeight - this.Height / 2);
         }
     }
 }
