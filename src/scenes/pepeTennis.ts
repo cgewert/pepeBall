@@ -8,7 +8,7 @@ import { PauseScene } from "./pause";
 
 export class PepeTennisScene extends Phaser.Scene
 {    
-    private static readonly WIN_COUNTER = 1;
+    private static readonly WIN_COUNTER = 10;
     private static readonly SCORING_GLOW_FACTOR = 8;
     private static readonly DEFAULT_SFX_VOLUME = 0.3;
 
