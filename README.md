@@ -1,4 +1,6 @@
-# Application Skeleton for Phaser 3 based 2D Game development
+# The amazing PepeBall game
+
+## https://dextercoding.itch.io/pepeball
 
 ## Setup
 
