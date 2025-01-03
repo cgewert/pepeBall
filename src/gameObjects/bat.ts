@@ -3,7 +3,8 @@ export class Bat extends Phaser.GameObjects.Sprite
     public static readonly DATA_KEY_BALL_X = "ballX";
     public static readonly DATA_KEY_BALL_Y = "ballY";
 
-    private _player_velocity = 21;
+    private _player_velocity = 18;
+    private _ai_velocity = 8;
     private _isAiControlled = false;
     private _aiYDirection = false;
 
@@ -75,7 +76,7 @@ export class Bat extends Phaser.GameObjects.Sprite
         const weight1 = Math.min(1, distanceToPlayer / (this.CanvasWidth / 2));
         const weight2 = 1 - weight1
         const targetY = (weight1 * target1) + (weight2 * target2);
-        const deltaY = Math.min(this.PlayerVelocity, Math.max(-this.PlayerVelocity, targetY - this.y));
+        const deltaY = Math.min(this._ai_velocity, Math.max(-this._ai_velocity, targetY - this.y));
 
         this._aiYDirection = deltaY < 0;
         let newY = this.y += deltaY;

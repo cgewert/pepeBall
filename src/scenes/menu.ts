@@ -9,7 +9,6 @@ export class MenuScene extends Phaser.Scene
     private static readonly DEFAULT_MUSIC_VOL = 0.02;
 
     private _selectedGameMode: GameMode = 1;
-    private _mainCam: Phaser.Cameras.Scene2D.Camera;
     private _textModeOneP: Phaser.GameObjects.Text;
     private _textModeTwoP: Phaser.GameObjects.Text;
     private _soundMenuToggle: Phaser.Sound.NoAudioSound | Phaser.Sound.WebAudioSound | Phaser.Sound.HTML5AudioSound;
@@ -44,9 +43,8 @@ export class MenuScene extends Phaser.Scene
 
     public create(data: any)
     {
-        this._mainCam = this.cameras.main;
-        const viewPortHalfWidth = this._mainCam.width / 2;
-        const viewPortHalfHeight = this._mainCam.height / 2;
+        const viewPortHalfWidth = this.sys.canvas.width / 2;
+        const viewPortHalfHeight = this.sys.canvas.height / 2;
 
         // Register scene event handlers
         this.input.keyboard.on('keydown-SPACE', (event: KeyboardEvent) =>
@@ -113,7 +111,7 @@ export class MenuScene extends Phaser.Scene
         }).setStroke('#111111', 6);
         this._textModeOneP.setPosition(viewPortHalfWidth - this._textModeOneP.width / 2, viewPortHalfHeight - this._textModeOneP.height / 2);
 
-        this._textModeTwoP = this.add.text(100, 150, 'Two Player Mode', {
+        this._textModeTwoP = this.add.text(0, 0, 'Two Player Mode', {
             fontSize: '52px',
             fontFamily: 'Arial',
             color: '#ffffff',
